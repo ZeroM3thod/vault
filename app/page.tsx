@@ -580,7 +580,7 @@ function Home() {
           </div>
           <div className='stat-sep' />
           <div className='stat-item'>
-            Referral Rate <strong>5%</strong> Per Withdrawal
+            Referral Rate <strong>7%</strong> Per Withdrawal
           </div>
           <div className='stat-sep' />
           <div className='stat-item'>
@@ -609,7 +609,7 @@ function Home() {
           </div>
           <div className='stat-sep' />
           <div className='stat-item'>
-            Referral Rate <strong>5%</strong> Per Withdrawal
+            Referral Rate <strong>7%</strong> Per Withdrawal
           </div>
           <div className='stat-sep' />
           <div className='stat-item'>
@@ -802,7 +802,7 @@ function Home() {
                   <span style={{ color: 'rgba(246,241,233,0.4)' }}>
                     Referral Bonus
                   </span>
-                  <strong>5% / Withdrawal</strong>
+                  <strong>7% / Season Profit</strong>
                 </div>
               </div>
             </div>
@@ -878,7 +878,7 @@ function Home() {
               others grow
             </h2>
             <p className='section-sub'>
-              Every time someone you referred makes a withdrawal, you earn 5% of
+              Every time someone you referred makes profits, you earn 7% of
               that amount — automatically, with no limits.
             </p>
             <br />
@@ -889,8 +889,8 @@ function Home() {
                 lineHeight: '1.8',
               }}
             >
-              Share your unique referral code. When your referee withdraws their
-              profits, 5% is credited to your VaultX wallet instantly. Stack
+              Share your unique referral code. When your referee make
+              profits, 7% is credited to your VaultX wallet instantly. Stack
               referrals with no cap — the more you refer, the more you passively
               earn.
             </p>
@@ -934,14 +934,14 @@ function Home() {
               </div>
               <div className='ref-info'>
                 <strong>You earn instantly</strong>
-                <span>5% of their withdrawal, auto-credited</span>
+                <span>7% of their profits, auto-credited</span>
               </div>
-              <div className='ref-badge'>5%</div>
+              <div className='ref-badge'>7%</div>
             </div>
             <div className='commission-box'>
-              <div className='commission-num'>5%</div>
+              <div className='commission-num'>7%</div>
               <div className='commission-text'>
-                <strong>Commission Per Withdrawal</strong>
+                <strong>Commission on Profit</strong>
                 <span>
                   No cap. No delays. Paid automatically
                   <br />
@@ -976,7 +976,7 @@ function Home() {
                 i: 'SN',
                 n: 'Sharmin Nahar',
                 r: 'Referral Earner · Chittagong',
-                roi: '+5% ×7',
+                roi: '+7% ×7',
                 t: '"The referral system is genuinely passive income. I referred seven colleagues from my office. Every time one of them withdraws, I get credited automatically. Last month alone I earned extra just from referrals."',
               },
               {
@@ -1494,7 +1494,7 @@ function Home() {
                   <label>Referral Code (Optional)</label>
                   <input
                     type='text'
-                    placeholder='Enter code to earn 5% bonus'
+                    placeholder='Enter code to earn 7% bonus'
                     value={signupReferral}
                     onChange={(e) => setSignupReferral(e.target.value)}
                   />
