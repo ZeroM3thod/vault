@@ -1,257 +1,51 @@
 'use client'
 
-import { useEffect, useRef, useState, Suspense } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
-type ModalType = 'login' | 'signup' | null
-
-function Home() {
+export default function HomePage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const supabase = createClient()
 
-  const [activeModal, setActiveModal] = useState<ModalType>(null)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [loginEmail, setLoginEmail] = useState('')
-  const [loginPassword, setLoginPassword] = useState('')
-  const [loginLoading, setLoginLoading] = useState(false)
-  const [loginError, setLoginError] = useState('')
-  const [signupName, setSignupName] = useState('')
-  const [signupEmail, setSignupEmail] = useState('')
-  const [signupPassword, setSignupPassword] = useState('')
-  const [signupReferral, setSignupReferral] = useState('')
-  const [signupLoading, setSignupLoading] = useState(false)
-  const [signupError, setSignupError] = useState('')
-  const [signupSuccess, setSignupSuccess] = useState(false)
-  const [showForgot, setShowForgot] = useState(false)
-  const [forgotEmail, setForgotEmail] = useState('')
-  const [forgotLoading, setForgotLoading] = useState(false)
-  const [forgotMsg, setForgotMsg] = useState('')
-  const [contactForm, setContactForm] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    subject: 'Season 4 Investment Query',
-    message: '',
-  })
+  const [contactForm, setContactForm] = useState({ firstName: '', lastName: '', email: '', subject: 'Season 4 Investment Query', message: '' })
   const [contactLoading, setContactLoading] = useState(false)
   const [contactMsg, setContactMsg] = useState('')
 
   useEffect(() => {
-    const modal = searchParams.get('modal')
-    if (modal === 'login') setActiveModal('login')
-    if (modal === 'signup') setActiveModal('signup')
-  }, [searchParams])
-
-  useEffect(() => {
-    document.body.style.overflow = activeModal ? 'hidden' : ''
-  }, [activeModal])
-
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
+    const canvas = canvasRef.current; if (!canvas) return
     const ctx = canvas.getContext('2d')!
-    let candles: any[] = [],
-      lines: any[] = [],
-      W = 0,
-      H = 0,
-      animId = 0
-    function resize() {
-      if (!canvas) return
-      W = canvas.width = window.innerWidth
-      H = canvas.height = window.innerHeight
-      initCandles()
-      initLines()
-    }
-    function initCandles() {
-      candles = []
-      const count = Math.floor(W / 48)
-      for (let i = 0; i < count; i++)
-        candles.push({
-          x: (i / count) * W + Math.random() * 40,
-          y: H * 0.3 + Math.random() * H * 0.5,
-          w: 10 + Math.random() * 8,
-          h: 20 + Math.random() * 60,
-          up: Math.random() > 0.4,
-          speed: 0.2 + Math.random() * 0.4,
-          phase: Math.random() * Math.PI * 2,
-          wick: 8 + Math.random() * 20,
-        })
-    }
-    function initLines() {
-      lines = []
-      for (let i = 0; i < 4; i++) {
-        const pts: any[] = []
-        for (let x = 0; x <= W; x += 40)
-          pts.push({ x, y: H * (0.2 + i * 0.18) + Math.random() * 60 })
-        lines.push({
-          pts,
-          speed: 0.15 + i * 0.05,
-          phase: i * 1.2,
-          amp: 18 + i * 8,
-        })
-      }
-    }
-    function drawCandles(t: number) {
-      candles.forEach((c) => {
-        const bob = Math.sin(t * c.speed + c.phase) * 8,
-          x = c.x,
-          y = c.y + bob
-        ctx.strokeStyle = 'rgba(28,28,28,1)'
-        ctx.lineWidth = 1
-        ctx.beginPath()
-        ctx.moveTo(x + c.w / 2, y - c.wick)
-        ctx.lineTo(x + c.w / 2, y + c.h + c.wick)
-        ctx.stroke()
-        ctx.fillStyle = c.up ? 'rgba(74,103,65,1)' : 'rgba(184,147,90,1)'
-        ctx.fillRect(x, y, c.w, c.h)
-        ctx.strokeRect(x, y, c.w, c.h)
-      })
-    }
-    function drawLines(t: number) {
-      lines.forEach((l, i) => {
-        ctx.beginPath()
-        l.pts.forEach((p: any, j: number) => {
-          const y = p.y + Math.sin(t * l.speed + j * 0.3 + l.phase) * l.amp
-          j === 0 ? ctx.moveTo(p.x, y) : ctx.lineTo(p.x, y)
-        })
-        ctx.strokeStyle =
-          i % 2 === 0 ? 'rgba(74,103,65,0.8)' : 'rgba(184,147,90,0.6)'
-        ctx.lineWidth = 1
-        ctx.stroke()
-      })
-    }
-    let t = 0
-    function animate() {
-      ctx.clearRect(0, 0, W, H)
-      t += 0.012
-      drawLines(t)
-      drawCandles(t)
-      animId = requestAnimationFrame(animate)
-    }
-    window.addEventListener('resize', resize)
-    resize()
-    animate()
-    return () => {
-      window.removeEventListener('resize', resize)
-      cancelAnimationFrame(animId)
-    }
+    let candles: any[] = [], lines: any[] = [], W = 0, H = 0, animId = 0
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; initCandles(); initLines() }
+    function initCandles() { candles = []; const count = Math.floor(W / 48); for (let i = 0; i < count; i++) candles.push({ x: (i / count) * W + Math.random() * 40, y: H * 0.3 + Math.random() * H * 0.5, w: 10 + Math.random() * 8, h: 20 + Math.random() * 60, up: Math.random() > 0.4, speed: 0.2 + Math.random() * 0.4, phase: Math.random() * Math.PI * 2, wick: 8 + Math.random() * 20 }) }
+    function initLines() { lines = []; for (let i = 0; i < 4; i++) { const pts: any[] = []; for (let x = 0; x <= W; x += 40) pts.push({ x, y: H * (0.2 + i * 0.18) + Math.random() * 60 }); lines.push({ pts, speed: 0.15 + i * 0.05, phase: i * 1.2, amp: 18 + i * 8 }) } }
+    function drawCandles(t: number) { candles.forEach(c => { const bob = Math.sin(t * c.speed + c.phase) * 8, x = c.x, y = c.y + bob; ctx.strokeStyle = 'rgba(28,28,28,1)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x + c.w / 2, y - c.wick); ctx.lineTo(x + c.w / 2, y + c.h + c.wick); ctx.stroke(); ctx.fillStyle = c.up ? 'rgba(74,103,65,1)' : 'rgba(184,147,90,1)'; ctx.fillRect(x, y, c.w, c.h); ctx.strokeRect(x, y, c.w, c.h) }) }
+    function drawLines(t: number) { lines.forEach((l, i) => { ctx.beginPath(); l.pts.forEach((p: any, j: number) => { const y = p.y + Math.sin(t * l.speed + j * 0.3 + l.phase) * l.amp; j === 0 ? ctx.moveTo(p.x, y) : ctx.lineTo(p.x, y) }); ctx.strokeStyle = i % 2 === 0 ? 'rgba(74,103,65,0.8)' : 'rgba(184,147,90,0.6)'; ctx.lineWidth = 1; ctx.stroke() }) }
+    let t = 0; function animate() { ctx.clearRect(0, 0, W, H); t += 0.012; drawLines(t); drawCandles(t); animId = requestAnimationFrame(animate) }
+    window.addEventListener('resize', resize); resize(); animate()
+    return () => { window.removeEventListener('resize', resize); cancelAnimationFrame(animId) }
   }, [])
 
   useEffect(() => {
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) e.target.classList.add('visible')
-        })
-      },
-      { threshold: 0.12 },
-    )
-    document.querySelectorAll('.reveal').forEach((r) => obs.observe(r))
+    const obs = new IntersectionObserver(entries => { entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible') }) }, { threshold: 0.12 })
+    document.querySelectorAll('.reveal').forEach(r => obs.observe(r))
     return () => obs.disconnect()
   }, [])
 
   useEffect(() => {
     const nav = document.getElementById('navbar')
-    const h = () => {
-      if (nav)
-        nav.style.borderBottomColor =
-          window.scrollY > 40 ? 'rgba(184,147,90,0.2)' : 'var(--border)'
-    }
-    window.addEventListener('scroll', h)
-    return () => window.removeEventListener('scroll', h)
+    const h = () => { if (nav) nav.style.borderBottomColor = window.scrollY > 40 ? 'rgba(184,147,90,0.2)' : 'var(--border)' }
+    window.addEventListener('scroll', h); return () => window.removeEventListener('scroll', h)
   }, [])
 
-  const openModal = (type: ModalType) => {
-    setActiveModal(type)
-    setMenuOpen(false)
-  }
-  const closeModal = () => {
-    setActiveModal(null)
-    setShowForgot(false)
-    setLoginError('')
-    setForgotMsg('')
-    setSignupError('')
-    setSignupSuccess(false)
-  }
-
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault()
-    setLoginLoading(true)
-    setLoginError('')
-    const { error } = await supabase.auth.signInWithPassword({
-      email: loginEmail,
-      password: loginPassword,
-    })
-    if (error) {
-      setLoginError(error.message)
-      setLoginLoading(false)
-      return
-    }
-    router.push('/dashboard')
-  }
-
-  async function handleSignup(e: React.FormEvent) {
-    e.preventDefault()
-    setSignupLoading(true)
-    setSignupError('')
-    const { error } = await supabase.auth.signUp({
-      email: signupEmail,
-      password: signupPassword,
-      options: {
-        data: { full_name: signupName, referral_code: signupReferral },
-        emailRedirectTo: `${window.location.origin}/dashboard`,
-      },
-    })
-    if (error) {
-      setSignupError(error.message)
-      setSignupLoading(false)
-      return
-    }
-    setSignupSuccess(true)
-    setSignupLoading(false)
-  }
-
-  async function handleForgotPassword(e: React.FormEvent) {
-    e.preventDefault()
-    setForgotLoading(true)
-    setForgotMsg('')
-    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
-      redirectTo: `${window.location.origin}/auth/reset-password`,
-    })
-    setForgotLoading(false)
-    setForgotMsg(
-      error ? error.message : 'Password reset link sent! Check your inbox.',
-    )
-  }
-
   async function handleContact(e: React.FormEvent) {
-    e.preventDefault()
-    setContactLoading(true)
-    setContactMsg('')
-    const res = await fetch('/api/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(contactForm),
-    })
-    const data = await res.json()
-    setContactLoading(false)
-    setContactMsg(
-      data.success
-        ? "Message sent! We'll respond within 24 hours."
-        : data.error || 'Failed to send.',
-    )
-    if (data.success)
-      setContactForm({
-        firstName: '',
-        lastName: '',
-        email: '',
-        subject: 'Season 4 Investment Query',
-        message: '',
-      })
+    e.preventDefault(); setContactLoading(true); setContactMsg('')
+    const res = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(contactForm) })
+    const data = await res.json(); setContactLoading(false)
+    setContactMsg(data.success ? "Message sent! We'll respond within 24 hours." : (data.error || 'Failed to send.'))
+    if (data.success) setContactForm({ firstName: '', lastName: '', email: '', subject: 'Season 4 Investment Query', message: '' })
   }
 
   return (
@@ -332,7 +126,7 @@ function Home() {
         .season-card::after{content:'';position:absolute;inset:0;background:var(--ink);opacity:0;transition:opacity 0.35s;z-index:0}
         .season-card:hover::after{opacity:0.03}
         .season-card>*{position:relative;z-index:1}
-        .season-card.active{background:var(--ink);border-color:var(--ink);grid-column:span 3}
+        .season-card.active{background:var(--ink);border-color:var(--ink)}
         .season-card.active *{color:var(--cream)!important}
         .season-card.active .season-tag{background:rgba(255,255,255,0.1);color:var(--gold-light)!important}
         .season-card.active .season-roi{color:var(--gold-light)!important}
@@ -379,7 +173,7 @@ function Home() {
         .testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
         .testi-card{background:var(--cream);border:1px solid var(--border);padding:32px 28px;position:relative;overflow:hidden;transition:all 0.3s}
         .testi-card:hover{border-color:var(--gold)}
-        .testi-card::before{content:'\\201C';position:absolute;top:-10px;right:20px;font-family:'Cormorant Garamond',serif;font-size:8rem;font-weight:600;color:rgba(184,147,90,0.07);line-height:1;pointer-events:none}
+        .testi-card::before{content:'\201C';position:absolute;top:-10px;right:20px;font-family:'Cormorant Garamond',serif;font-size:8rem;font-weight:600;color:rgba(184,147,90,0.07);line-height:1;pointer-events:none}
         .testi-stars{display:flex;gap:3px;margin-bottom:18px}
         .testi-stars span{color:var(--gold);font-size:0.8rem}
         .testi-text{font-size:0.85rem;color:var(--ink);line-height:1.8;font-weight:300;margin-bottom:24px;font-style:italic}
@@ -437,370 +231,146 @@ function Home() {
         .footer-legal{display:flex;gap:24px}
         .footer-legal a{font-size:0.72rem;color:rgba(246,241,233,0.25);text-decoration:none;letter-spacing:0.04em;transition:color 0.2s}
         .footer-legal a:hover{color:var(--cream)}
-        .modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,28,28,0.7);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(6px);padding:20px}
-        .modal-overlay.active{display:flex}
-        .modal{background:var(--cream);width:100%;max-width:420px;border-radius:var(--radius);overflow:hidden;animation:modalIn 0.3s ease}
-        @keyframes modalIn{from{opacity:0;transform:translateY(20px) scale(0.97)}to{opacity:1;transform:none}}
-        .modal-head{background:var(--ink);padding:28px 32px;display:flex;align-items:center;justify-content:space-between}
-        .modal-head h3{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:400;color:var(--cream)}
-        .modal-close{background:none;border:none;cursor:pointer;color:rgba(246,241,233,0.4);font-size:1.3rem;line-height:1;transition:color 0.2s}
-        .modal-close:hover{color:var(--cream)}
-        .modal-body{padding:32px;display:flex;flex-direction:column;gap:14px}
-        .modal-input{display:flex;flex-direction:column;gap:6px}
-        .modal-input label{font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-secondary)}
-        .modal-input input{padding:12px 14px;background:var(--surface);border:1px solid var(--border);font-family:'DM Sans',sans-serif;font-size:0.85rem;color:var(--ink);border-radius:var(--radius);outline:none;transition:border-color 0.2s;width:100%}
-        .modal-input input:focus{border-color:var(--gold)}
-        .modal-submit{width:100%;padding:13px;background:var(--ink);color:var(--cream);border:none;font-family:'DM Sans',sans-serif;font-size:0.8rem;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;border-radius:var(--radius);transition:background 0.25s;margin-top:4px}
-        .modal-submit:hover{background:var(--gold)}.modal-submit:disabled{opacity:0.6;cursor:not-allowed}
-        .modal-switch{text-align:center;font-size:0.78rem;color:var(--text-secondary)}
-        .modal-switch a{color:var(--gold);text-decoration:none;cursor:pointer;font-weight:500}
-        .modal-error{font-size:0.78rem;color:#c0392b;background:rgba(192,57,43,0.07);border:1px solid rgba(192,57,43,0.2);padding:8px 12px;border-radius:var(--radius);text-align:center}
-        .modal-success{font-size:0.82rem;color:var(--sage);background:rgba(74,103,65,0.08);border:1px solid rgba(74,103,65,0.2);padding:12px 16px;border-radius:var(--radius);text-align:center;line-height:1.6}
-        .modal-link{font-size:0.75rem;color:var(--gold);cursor:pointer;text-align:right;text-decoration:underline;margin-top:-6px;background:none;border:none;font-family:'DM Sans',sans-serif;width:100%}
         .reveal{opacity:0;transform:translateY(28px);transition:all 0.7s ease}.reveal.visible{opacity:1;transform:none}
         @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-        @media(max-width:900px){.nav-links,.nav-actions{display:none}.hamburger{display:flex}.platform-stats .inner{grid-template-columns:1fr;gap:40px}.seasons-grid{grid-template-columns:1fr}.seasons-grid .season-card.active{grid-column:span 1}.hiw-steps{grid-template-columns:1fr 1fr}.hiw-header{grid-template-columns:1fr;gap:24px}.referral-inner{grid-template-columns:1fr;gap:40px}.testi-grid{grid-template-columns:1fr}.about-inner{grid-template-columns:1fr;gap:40px}.about-aside{position:static}.contact-inner{grid-template-columns:1fr;gap:48px}.footer-top{grid-template-columns:1fr 1fr;gap:36px}.form-row{grid-template-columns:1fr}.seasons-header{grid-template-columns:1fr}}
+        @media(max-width:900px){.nav-links,.nav-actions{display:none}.hamburger{display:flex}.platform-stats .inner{grid-template-columns:1fr;gap:40px}.seasons-grid{grid-template-columns:1fr}.hiw-steps{grid-template-columns:1fr 1fr}.hiw-header{grid-template-columns:1fr;gap:24px}.referral-inner{grid-template-columns:1fr;gap:40px}.testi-grid{grid-template-columns:1fr}.about-inner{grid-template-columns:1fr;gap:40px}.about-aside{position:static}.contact-inner{grid-template-columns:1fr;gap:48px}.footer-top{grid-template-columns:1fr 1fr;gap:36px}.form-row{grid-template-columns:1fr}.seasons-header{grid-template-columns:1fr}}
         @media(max-width:560px){.hiw-steps{grid-template-columns:1fr}.footer-top{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr 1fr}.about-features{grid-template-columns:1fr}.hero-cta{flex-direction:column;width:100%}.btn-lg,.btn-outline-lg{width:100%}.footer-bottom{flex-direction:column;align-items:start}}
       `}</style>
 
-      <canvas id='bg-canvas' ref={canvasRef} />
+      <canvas id="bg-canvas" ref={canvasRef} />
 
       {/* NAVBAR */}
-      <nav id='navbar'>
-        <div className='nav-inner'>
-          <a href='#' className='logo'>
-            <div className='logo-mark' />
-            <span className='logo-text'>
-              Vault<span>X</span>
-            </span>
-          </a>
-          <ul className='nav-links'>
-            <li>
-              <a href='#about'>About Us</a>
-            </li>
-            <li>
-              <a href='#seasons'>Seasons</a>
-            </li>
-            <li>
-              <a href='#contact'>Contact Us</a>
-            </li>
+      <nav id="navbar">
+        <div className="nav-inner">
+          <a href="#" className="logo"><div className="logo-mark" /><span className="logo-text">Vault<span>X</span></span></a>
+          <ul className="nav-links">
+            <li><a href="#about">About Us</a></li>
+            <li><a href="#seasons">Seasons</a></li>
+            <li><a href="#contact">Contact Us</a></li>
           </ul>
-          <div className='nav-actions'>
-            <button className='btn-ghost' onClick={() => openModal('login')}>
-              Login
-            </button>
-            <button className='btn-ghost' onClick={() => openModal('signup')}>
-              Sign Up
-            </button>
-            <button className='btn-primary' onClick={() => openModal('signup')}>
-              Get Started
-            </button>
+          <div className="nav-actions">
+            <button className="btn-ghost" onClick={() => router.push('/auth/signin')}>Login</button>
+            <button className="btn-ghost" onClick={() => router.push('/auth/signup')}>Sign Up</button>
+            <button className="btn-primary" onClick={() => router.push('/auth/signup')}>Get Started</button>
           </div>
-          <div className='hamburger' onClick={() => setMenuOpen(!menuOpen)}>
-            <span />
-            <span />
-            <span />
-          </div>
+          <div className="hamburger" onClick={() => setMenuOpen(!menuOpen)}><span /><span /><span /></div>
         </div>
       </nav>
 
       {/* MOBILE MENU */}
       <div className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
-        <a href='#about' onClick={() => setMenuOpen(false)}>
-          About Us
-        </a>
-        <a href='#seasons' onClick={() => setMenuOpen(false)}>
-          Seasons
-        </a>
-        <a href='#contact' onClick={() => setMenuOpen(false)}>
-          Contact Us
-        </a>
-        <div className='mob-actions'>
-          <button className='btn-ghost' onClick={() => openModal('login')}>
-            Login
-          </button>
-          <button className='btn-ghost' onClick={() => openModal('signup')}>
-            Sign Up
-          </button>
-          <button className='btn-primary' onClick={() => openModal('signup')}>
-            Get Started
-          </button>
+        <a href="#about" onClick={() => setMenuOpen(false)}>About Us</a>
+        <a href="#seasons" onClick={() => setMenuOpen(false)}>Seasons</a>
+        <a href="#contact" onClick={() => setMenuOpen(false)}>Contact Us</a>
+        <div className="mob-actions">
+          <button className="btn-ghost" onClick={() => router.push('/auth/signin')}>Login</button>
+          <button className="btn-ghost" onClick={() => router.push('/auth/signup')}>Sign Up</button>
+          <button className="btn-primary" onClick={() => router.push('/auth/signup')}>Get Started</button>
         </div>
       </div>
 
       {/* HERO */}
-      <section className='hero'>
-        <div className='hero-inner'>
-          <div className='hero-badge'>Season 4 — Now Open</div>
-          <h1>
-            Where capital grows
-            <br />
-            with <em>discipline</em>
-          </h1>
-          <p>
-            A structured investment platform operating through defined seasonal
-            cycles. No speculation. No volatility. Consistent, transparent
-            returns.
-          </p>
-          <div className='hero-cta'>
-            <button className='btn-lg' onClick={() => openModal('signup')}>
-              Start Investing
-            </button>
-            <button
-              className='btn-outline-lg'
-              onClick={() =>
-                document
-                  .getElementById('seasons')
-                  ?.scrollIntoView({ behavior: 'smooth' })
-              }
-            >
-              View Seasons
-            </button>
+      <section className="hero">
+        <div className="hero-inner">
+          <div className="hero-badge">Season 4 — Now Open</div>
+          <h1>Where capital grows<br />with <em>discipline</em></h1>
+          <p>A structured investment platform operating through defined seasonal cycles. No speculation. No volatility. Consistent, transparent returns.</p>
+          <div className="hero-cta">
+            <button className="btn-lg" onClick={() => router.push('/auth/signup')}>Start Investing</button>
+            <button className="btn-outline-lg" onClick={() => document.getElementById('seasons')?.scrollIntoView({ behavior: 'smooth' })}>View Seasons</button>
           </div>
         </div>
       </section>
 
       {/* STATS TICKER */}
-      <div className='stats-bar'>
-        <div className='stats-track'>
-          <div className='stat-item'>
-            <strong>50,000+</strong> Active Investors
-          </div>
-          <div className='stat-sep' />
-          <div className='stat-item'>
-            <strong>100M+</strong> USDT Invested
-          </div>
-          <div className='stat-sep' />
-          <div className='stat-item'>
-            Season 3 ROI <strong>+28.4%</strong>
-          </div>
-          <div className='stat-sep' />
-          <div className='stat-item'>
-            <strong>$4.2M+</strong> Paid Out
-          </div>
-          <div className='stat-sep' />
-          <div className='stat-item'>
-            Referral Rate <strong>7%</strong> Per Withdrawal
-          </div>
-          <div className='stat-sep' />
-          <div className='stat-item'>
-            <strong>99.8%</strong> On-Time Payouts
-          </div>
-          <div className='stat-sep' />
-          <div className='stat-item'>
-            Season 4 <strong>Now Live</strong>
-          </div>
-          <div className='stat-sep' />
+      <div className="stats-bar">
+        <div className="stats-track">
+          <div className="stat-item"><strong>50,000+</strong> Active Investors</div><div className="stat-sep" />
+          <div className="stat-item"><strong>100M+</strong> USDT Invested</div><div className="stat-sep" />
+          <div className="stat-item">Season 3 ROI <strong>+28.4%</strong></div><div className="stat-sep" />
+          <div className="stat-item"><strong>$4.2M+</strong> Paid Out</div><div className="stat-sep" />
+          <div className="stat-item">Referral Rate <strong>5%</strong> Per Withdrawal</div><div className="stat-sep" />
+          <div className="stat-item"><strong>99.8%</strong> On-Time Payouts</div><div className="stat-sep" />
+          <div className="stat-item">Season 4 <strong>Now Live</strong></div><div className="stat-sep" />
           {/* duplicate for seamless loop */}
-          <div className='stat-item'>
-            <strong>50,000+</strong> Active Investors
-          </div>
-          <div className='stat-sep' />
-          <div className='stat-item'>
-            <strong>100M+</strong> USDT Invested
-          </div>
-          <div className='stat-sep' />
-          <div className='stat-item'>
-            Season 3 ROI <strong>+28.4%</strong>
-          </div>
-          <div className='stat-sep' />
-          <div className='stat-item'>
-            <strong>$4.2M+</strong> Paid Out
-          </div>
-          <div className='stat-sep' />
-          <div className='stat-item'>
-            Referral Rate <strong>7%</strong> Per Withdrawal
-          </div>
-          <div className='stat-sep' />
-          <div className='stat-item'>
-            <strong>99.8%</strong> On-Time Payouts
-          </div>
-          <div className='stat-sep' />
-          <div className='stat-item'>
-            Season 4 <strong>Now Live</strong>
-          </div>
+          <div className="stat-item"><strong>50,000+</strong> Active Investors</div><div className="stat-sep" />
+          <div className="stat-item"><strong>100M+</strong> USDT Invested</div><div className="stat-sep" />
+          <div className="stat-item">Season 3 ROI <strong>+28.4%</strong></div><div className="stat-sep" />
+          <div className="stat-item"><strong>$4.2M+</strong> Paid Out</div><div className="stat-sep" />
+          <div className="stat-item">Referral Rate <strong>5%</strong> Per Withdrawal</div><div className="stat-sep" />
+          <div className="stat-item"><strong>99.8%</strong> On-Time Payouts</div><div className="stat-sep" />
+          <div className="stat-item">Season 4 <strong>Now Live</strong></div>
         </div>
       </div>
 
       {/* PLATFORM STATS */}
-      <section className='platform-stats'>
-        <div className='inner'>
-          <div className='stats-text reveal'>
-            <span className='section-label'>Platform Performance</span>
-            <h2 className='section-title'>
-              Numbers that
-              <br />
-              speak for themselves
-            </h2>
-            <p className='section-sub'>
-              Since our first season, we have maintained consistent returns,
-              full transparency, and zero withdrawal failures.
-            </p>
+      <section className="platform-stats">
+        <div className="inner">
+          <div className="stats-text reveal">
+            <span className="section-label">Platform Performance</span>
+            <h2 className="section-title">Numbers that<br />speak for themselves</h2>
+            <p className="section-sub">Since our first season, we have maintained consistent returns, full transparency, and zero withdrawal failures.</p>
           </div>
-          <div className='stats-grid reveal'>
-            <div className='stat-card'>
-              <div className='stat-trend'>↑ Active</div>
-              <div className='stat-number'>
-                50<span>K+</span>
-              </div>
-              <div className='stat-desc'>Verified Investors</div>
-            </div>
-            <div className='stat-card'>
-              <div className='stat-trend'>↑ Growing</div>
-              <div className='stat-number'>
-                100<span>M+</span>
-              </div>
-              <div className='stat-desc'>USDT Total Invested</div>
-            </div>
-            <div className='stat-card'>
-              <div className='stat-trend'>Last Season</div>
-              <div className='stat-number'>
-                28<span>.4%</span>
-              </div>
-              <div className='stat-desc'>Season 3 ROI</div>
-            </div>
-            <div className='stat-card'>
-              <div className='stat-trend'>All Time</div>
-              <div className='stat-number'>
-                4.2<span>M+</span>
-              </div>
-              <div className='stat-desc'>USDT Paid Out</div>
-            </div>
+          <div className="stats-grid reveal">
+            <div className="stat-card"><div className="stat-trend">↑ Active</div><div className="stat-number">50<span>K+</span></div><div className="stat-desc">Verified Investors</div></div>
+            <div className="stat-card"><div className="stat-trend">↑ Growing</div><div className="stat-number">100<span>M+</span></div><div className="stat-desc">USDT Total Invested</div></div>
+            <div className="stat-card"><div className="stat-trend">Last Season</div><div className="stat-number">28<span>.4%</span></div><div className="stat-desc">Season 3 ROI</div></div>
+            <div className="stat-card"><div className="stat-trend">All Time</div><div className="stat-number">4.2<span>M+</span></div><div className="stat-desc">USDT Paid Out</div></div>
           </div>
         </div>
       </section>
 
       {/* SEASONS */}
-      <section className='seasons' id='seasons'>
-        <div className='seasons-inner'>
-          <div className='seasons-header reveal'>
-            <div>
-              <span className='section-label'>Investment Seasons</span>
-              <h2 className='section-title'>
-                Structured cycles,
-                <br />
-                predictable returns
-              </h2>
-            </div>
-            <button className='btn-primary' onClick={() => openModal('signup')}>
-              Join Season 4
-            </button>
+      <section className="seasons" id="seasons">
+        <div className="seasons-inner">
+          <div className="seasons-header reveal">
+            <div><span className="section-label">Investment Seasons</span><h2 className="section-title">Structured cycles,<br />predictable returns</h2></div>
+            <button className="btn-primary" onClick={() => router.push('/auth/signup')}>Join Season 4</button>
           </div>
-          <div className='seasons-grid reveal'>
-            <div className='season-card'>
-              <div className='season-tag'>Completed</div>
-              <div className='season-name'>Season One</div>
-              <div className='season-period'>Jan 2023 — Apr 2023</div>
-              <div className='season-roi'>+18.2%</div>
-              <div className='season-roi-label'>Final ROI</div>
-              <div className='season-detail'>
-                <div className='season-detail-item'>
-                  <span>Total Pool</span>
-                  <strong>$12M</strong>
-                </div>
-                <div className='season-detail-item'>
-                  <span>Investors</span>
-                  <strong>8,400</strong>
-                </div>
-                <div className='season-detail-item'>
-                  <span>Duration</span>
-                  <strong>90 Days</strong>
-                </div>
+          <div className="seasons-grid reveal">
+            <div className="season-card">
+              <div className="season-tag">Completed</div><div className="season-name">Season One</div><div className="season-period">Jan 2023 — Apr 2023</div>
+              <div className="season-roi">+18.2%</div><div className="season-roi-label">Final ROI</div>
+              <div className="season-detail">
+                <div className="season-detail-item"><span>Total Pool</span><strong>$12M</strong></div>
+                <div className="season-detail-item"><span>Investors</span><strong>8,400</strong></div>
+                <div className="season-detail-item"><span>Duration</span><strong>90 Days</strong></div>
               </div>
             </div>
-            <div className='season-card'>
-              <div className='season-tag'>Completed</div>
-              <div className='season-name'>Season Two</div>
-              <div className='season-period'>Jun 2023 — Sep 2023</div>
-              <div className='season-roi'>+23.7%</div>
-              <div className='season-roi-label'>Final ROI</div>
-              <div className='season-detail'>
-                <div className='season-detail-item'>
-                  <span>Total Pool</span>
-                  <strong>$31M</strong>
-                </div>
-                <div className='season-detail-item'>
-                  <span>Investors</span>
-                  <strong>19,200</strong>
-                </div>
-                <div className='season-detail-item'>
-                  <span>Duration</span>
-                  <strong>90 Days</strong>
-                </div>
+            <div className="season-card">
+              <div className="season-tag">Completed</div><div className="season-name">Season Two</div><div className="season-period">Jun 2023 — Sep 2023</div>
+              <div className="season-roi">+23.7%</div><div className="season-roi-label">Final ROI</div>
+              <div className="season-detail">
+                <div className="season-detail-item"><span>Total Pool</span><strong>$31M</strong></div>
+                <div className="season-detail-item"><span>Investors</span><strong>19,200</strong></div>
+                <div className="season-detail-item"><span>Duration</span><strong>90 Days</strong></div>
               </div>
             </div>
-            <div className='season-card'>
-              <div className='season-tag'>Completed</div>
-              <div className='season-name'>Season Three</div>
-              <div className='season-period'>Nov 2023 — Feb 2024</div>
-              <div className='season-roi'>+28.4%</div>
-              <div className='season-roi-label'>Final ROI</div>
-              <div className='season-detail'>
-                <div className='season-detail-item'>
-                  <span>Total Pool</span>
-                  <strong>$57M</strong>
-                </div>
-                <div className='season-detail-item'>
-                  <span>Investors</span>
-                  <strong>34,800</strong>
-                </div>
-                <div className='season-detail-item'>
-                  <span>Duration</span>
-                  <strong>90 Days</strong>
-                </div>
+            <div className="season-card">
+              <div className="season-tag">Completed</div><div className="season-name">Season Three</div><div className="season-period">Nov 2023 — Feb 2024</div>
+              <div className="season-roi">+28.4%</div><div className="season-roi-label">Final ROI</div>
+              <div className="season-detail">
+                <div className="season-detail-item"><span>Total Pool</span><strong>$57M</strong></div>
+                <div className="season-detail-item"><span>Investors</span><strong>34,800</strong></div>
+                <div className="season-detail-item"><span>Duration</span><strong>90 Days</strong></div>
               </div>
             </div>
-            <div className='season-card active'>
-              <div className='season-tag'>Now Open · Limited Slots</div>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr auto',
-                  gap: '20px',
-                  alignItems: 'start',
-                }}
-              >
+            <div className="season-card active" style={{ gridColumn: 'span 3' }}>
+              <div className="season-tag">Now Open · Limited Slots</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '20px', alignItems: 'start' }}>
                 <div>
-                  <div className='season-name'>Season Four</div>
-                  <div className='season-period'>
-                    May 2025 — Aug 2025 · Entries close in 18 days
-                  </div>
-                  <div className='season-roi'>+24–32%</div>
-                  <div className='season-roi-label'>Projected ROI Range</div>
+                  <div className="season-name">Season Four</div>
+                  <div className="season-period">May 2025 — Aug 2025 · Entries close in 18 days</div>
+                  <div className="season-roi">+24–32%</div>
+                  <div className="season-roi-label">Projected ROI Range</div>
                 </div>
-                <button
-                  className='btn-primary'
-                  style={{ whiteSpace: 'nowrap', padding: '12px 28px' }}
-                  onClick={() => openModal('signup')}
-                >
-                  Invest Now
-                </button>
+                <button className="btn-primary" style={{ whiteSpace: 'nowrap', padding: '12px 28px' }} onClick={() => router.push('/auth/signup')}>Invest Now</button>
               </div>
-              <div className='season-detail' style={{ marginTop: '20px' }}>
-                <div className='season-detail-item'>
-                  <span style={{ color: 'rgba(246,241,233,0.4)' }}>
-                    Min. Entry
-                  </span>
-                  <strong>$100 USDT</strong>
-                </div>
-                <div className='season-detail-item'>
-                  <span style={{ color: 'rgba(246,241,233,0.4)' }}>
-                    Pool Cap
-                  </span>
-                  <strong>$80M</strong>
-                </div>
-                <div className='season-detail-item'>
-                  <span style={{ color: 'rgba(246,241,233,0.4)' }}>
-                    Duration
-                  </span>
-                  <strong>90 Days</strong>
-                </div>
-                <div className='season-detail-item'>
-                  <span style={{ color: 'rgba(246,241,233,0.4)' }}>
-                    Referral Bonus
-                  </span>
-                  <strong>7% / Season Profit</strong>
-                </div>
+              <div className="season-detail" style={{ marginTop: '20px' }}>
+                <div className="season-detail-item"><span style={{ color: 'rgba(246,241,233,0.4)' }}>Min. Entry</span><strong>$100 USDT</strong></div>
+                <div className="season-detail-item"><span style={{ color: 'rgba(246,241,233,0.4)' }}>Pool Cap</span><strong>$80M</strong></div>
+                <div className="season-detail-item"><span style={{ color: 'rgba(246,241,233,0.4)' }}>Duration</span><strong>90 Days</strong></div>
+                <div className="season-detail-item"><span style={{ color: 'rgba(246,241,233,0.4)' }}>Referral Bonus</span><strong>5% / Withdrawal</strong></div>
               </div>
             </div>
           </div>
@@ -808,219 +378,76 @@ function Home() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className='how-it-works'>
-        <div className='hiw-inner'>
-          <div className='hiw-header reveal'>
-            <div>
-              <span className='section-label'>Process</span>
-              <h2 className='section-title'>
-                Simple steps,
-                <br />
-                serious results
-              </h2>
-            </div>
-            <p
-              className='section-sub'
-              style={{ color: 'rgba(246,241,233,0.45)' }}
-            >
-              No complexity. No jargon. Just a clear, proven system that has
-              delivered returns across three consecutive seasons.
-            </p>
+      <section className="how-it-works">
+        <div className="hiw-inner">
+          <div className="hiw-header reveal">
+            <div><span className="section-label">Process</span><h2 className="section-title">Simple steps,<br />serious results</h2></div>
+            <p className="section-sub" style={{ color: 'rgba(246,241,233,0.45)' }}>No complexity. No jargon. Just a clear, proven system that has delivered returns across three consecutive seasons.</p>
           </div>
-          <div className='hiw-steps reveal'>
-            <div className='step'>
-              <div className='step-num'>01</div>
-              <h4>Create Your Account</h4>
-              <p>
-                Register in under two minutes. Verify your identity and set your
-                investment preferences.
-              </p>
-            </div>
-            <div className='step'>
-              <div className='step-num'>02</div>
-              <h4>Choose Your Season</h4>
-              <p>
-                Select an open season, review its projected ROI and pool
-                details, and decide your entry amount.
-              </p>
-            </div>
-            <div className='step'>
-              <div className='step-num'>03</div>
-              <h4>Deposit USDT</h4>
-              <p>
-                Fund your position via USDT (TRC-20 or ERC-20). Your investment
-                is locked in for the season duration.
-              </p>
-            </div>
-            <div className='step'>
-              <div className='step-num'>04</div>
-              <h4>Withdraw Profits</h4>
-              <p>
-                At season close, withdraw your principal plus earned returns —
-                directly to your wallet.
-              </p>
-            </div>
+          <div className="hiw-steps reveal">
+            <div className="step"><div className="step-num">01</div><h4>Create Your Account</h4><p>Register in under two minutes. Verify your identity and set your investment preferences.</p></div>
+            <div className="step"><div className="step-num">02</div><h4>Choose Your Season</h4><p>Select an open season, review its projected ROI and pool details, and decide your entry amount.</p></div>
+            <div className="step"><div className="step-num">03</div><h4>Deposit USDT</h4><p>Fund your position via USDT (TRC-20 or ERC-20). Your investment is locked in for the season duration.</p></div>
+            <div className="step"><div className="step-num">04</div><h4>Withdraw Profits</h4><p>At season close, withdraw your principal plus earned returns — directly to your wallet.</p></div>
           </div>
         </div>
       </section>
 
       {/* REFERRAL */}
-      <section className='referral'>
-        <div className='referral-inner'>
-          <div className='reveal'>
-            <span className='section-label'>Referral Programme</span>
-            <h2 className='section-title'>
-              Earn while
-              <br />
-              others grow
-            </h2>
-            <p className='section-sub'>
-              Every time someone you referred makes profits, you earn 7% of that
-              amount — automatically, with no limits.
-            </p>
+      <section className="referral">
+        <div className="referral-inner">
+          <div className="reveal">
+            <span className="section-label">Referral Programme</span>
+            <h2 className="section-title">Earn while<br />others grow</h2>
+            <p className="section-sub">Every time someone you referred makes a withdrawal, you earn 5% of that amount — automatically, with no limits.</p>
             <br />
-            <p
-              style={{
-                fontSize: '0.82rem',
-                color: 'var(--text-secondary)',
-                lineHeight: '1.8',
-              }}
-            >
-              Share your unique referral code. When your referee make profits,
-              7% is credited to your VaultX wallet instantly. Stack referrals
-              with no cap — the more you refer, the more you passively earn.
-            </p>
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: '1.8' }}>Share your unique referral code. When your referee withdraws their profits, 5% is credited to your VaultX wallet instantly. Stack referrals with no cap — the more you refer, the more you passively earn.</p>
             <br />
-            <button
-              className='btn-lg'
-              onClick={() => openModal('signup')}
-              style={{ marginTop: '8px' }}
-            >
-              Get My Referral Code
-            </button>
+            <button className="btn-lg" onClick={() => router.push('/auth/signup')} style={{ marginTop: '8px' }}>Get My Referral Code</button>
           </div>
-          <div className='referral-visual reveal'>
-            <div className='ref-card'>
-              <div className='ref-icon'>
-                <svg viewBox='0 0 24 24'>
-                  <path d='M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z' />
-                </svg>
-              </div>
-              <div className='ref-info'>
-                <strong>You refer a friend</strong>
-                <span>They sign up and invest in a season</span>
-              </div>
+          <div className="referral-visual reveal">
+            <div className="ref-card">
+              <div className="ref-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" /></svg></div>
+              <div className="ref-info"><strong>You refer a friend</strong><span>They sign up and invest in a season</span></div>
             </div>
-            <div className='ref-card'>
-              <div className='ref-icon'>
-                <svg viewBox='0 0 24 24'>
-                  <path d='M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-7 3a2 2 0 110 4 2 2 0 010-4zm4 12H8v-.75C8 15.45 10 14 12 14s4 1.45 4 3.25V18z' />
-                </svg>
-              </div>
-              <div className='ref-info'>
-                <strong>They make a withdrawal</strong>
-                <span>At the end of their investment season</span>
-              </div>
+            <div className="ref-card">
+              <div className="ref-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-7 3a2 2 0 110 4 2 2 0 010-4zm4 12H8v-.75C8 15.45 10 14 12 14s4 1.45 4 3.25V18z" /></svg></div>
+              <div className="ref-info"><strong>They make a withdrawal</strong><span>At the end of their investment season</span></div>
             </div>
-            <div className='ref-card'>
-              <div className='ref-icon'>
-                <svg viewBox='0 0 24 24'>
-                  <path d='M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z' />
-                </svg>
-              </div>
-              <div className='ref-info'>
-                <strong>You earn instantly</strong>
-                <span>7% of their profits, auto-credited</span>
-              </div>
-              <div className='ref-badge'>7%</div>
+            <div className="ref-card">
+              <div className="ref-icon"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z" /></svg></div>
+              <div className="ref-info"><strong>You earn instantly</strong><span>5% of their withdrawal, auto-credited</span></div>
+              <div className="ref-badge">5%</div>
             </div>
-            <div className='commission-box'>
-              <div className='commission-num'>7%</div>
-              <div className='commission-text'>
-                <strong>Commission on Profit</strong>
-                <span>
-                  No cap. No delays. Paid automatically
-                  <br />
-                  to your VaultX wallet.
-                </span>
-              </div>
+            <div className="commission-box">
+              <div className="commission-num">5%</div>
+              <div className="commission-text"><strong>Commission Per Withdrawal</strong><span>No cap. No delays. Paid automatically<br />to your VaultX wallet.</span></div>
             </div>
           </div>
         </div>
       </section>
 
       {/* TESTIMONIALS */}
-      <section className='testimonials'>
-        <div className='testi-inner'>
-          <div className='testi-header reveal'>
-            <span className='section-label'>Testimonials</span>
-            <h2 className='section-title'>Words from our investors</h2>
-            <p className='section-sub'>
-              Real people, real returns. Here is what our community has to say.
-            </p>
+      <section className="testimonials">
+        <div className="testi-inner">
+          <div className="testi-header reveal">
+            <span className="section-label">Testimonials</span>
+            <h2 className="section-title">Words from our investors</h2>
+            <p className="section-sub">Real people, real returns. Here is what our community has to say.</p>
           </div>
-          <div className='testi-grid reveal'>
+          <div className="testi-grid reveal">
             {[
-              {
-                i: 'RM',
-                n: 'Rafiqul Molla',
-                r: 'Investor since Season 2 · Dhaka',
-                roi: '+23.4%',
-                t: '"I was skeptical at first — every platform promises returns. But VaultX delivered exactly what Season 2 projected. Withdrew 23.4% on top of my principal without a single issue. I am now in Season 4 with three times my original stake."',
-              },
-              {
-                i: 'SN',
-                n: 'Sharmin Nahar',
-                r: 'Referral Earner · Chittagong',
-                roi: '+7% ×7',
-                t: '"The referral system is genuinely passive income. I referred seven colleagues from my office. Every time one of them withdraws, I get credited automatically. Last month alone I earned extra just from referrals."',
-              },
-              {
-                i: 'AH',
-                n: 'Aminul Hossain',
-                r: 'Investor since Season 1 · Sylhet',
-                roi: '+28.1%',
-                t: '"Season 3 gave me the confidence to invest more seriously. The platform is transparent — you see the pool size, the projected ROI, and the exact end date. That clarity is rare. Already locked in for Season 4."',
-              },
-              {
-                i: 'FK',
-                n: 'Farzana Khanam',
-                r: 'First-time Investor · Rajshahi',
-                roi: '+18.2%',
-                t: '"As a small investor starting with just $200, I appreciated that VaultX has no minimum pressure. The returns were proportional, the withdrawal was fast, and customer support actually responded within hours."',
-              },
-              {
-                i: 'MR',
-                n: 'Mostafizur Rahman',
-                r: 'International Investor · Khulna',
-                roi: '+26.8%',
-                t: '"I have used similar platforms in Malaysia and Singapore. VaultX is comparable in professionalism — maybe better in terms of communication. The season-based model removes emotional trading decisions entirely."',
-              },
-              {
-                i: 'NB',
-                n: 'Nasreen Begum',
-                r: 'Repeat Investor · Mymensingh',
-                roi: '+27.9%',
-                t: '"My husband and I both invested in Season 3 independently. We both received our returns on the same day, right at the 90-day mark. The consistency here is something we tell everyone in our circle about."',
-              },
-            ].map((c, idx) => (
-              <div className='testi-card' key={idx}>
-                <div className='testi-stars'>
-                  <span>★</span>
-                  <span>★</span>
-                  <span>★</span>
-                  <span>★</span>
-                  <span>★</span>
-                </div>
-                <p className='testi-text'>{c.t}</p>
-                <div className='testi-author'>
-                  <div className='testi-avatar'>{c.i}</div>
-                  <div>
-                    <div className='testi-name'>{c.n}</div>
-                    <div className='testi-role'>{c.r}</div>
-                  </div>
-                  <div className='testi-roi'>{c.roi}</div>
-                </div>
+              { i:'RM', n:'Rafiqul Molla', r:'Investor since Season 2 · Dhaka', roi:'+23.4%', t:'"I was skeptical at first — every platform promises returns. But VaultX delivered exactly what Season 2 projected. Withdrew 23.4% on top of my principal without a single issue. I am now in Season 4 with three times my original stake."' },
+              { i:'SN', n:'Sharmin Nahar', r:'Referral Earner · Chittagong', roi:'+5% ×7', t:'"The referral system is genuinely passive income. I referred seven colleagues from my office. Every time one of them withdraws, I get credited automatically. Last month alone I earned extra just from referrals."' },
+              { i:'AH', n:'Aminul Hossain', r:'Investor since Season 1 · Sylhet', roi:'+28.1%', t:'"Season 3 gave me the confidence to invest more seriously. The platform is transparent — you see the pool size, the projected ROI, and the exact end date. That clarity is rare. Already locked in for Season 4."' },
+              { i:'FK', n:'Farzana Khanam', r:'First-time Investor · Rajshahi', roi:'+18.2%', t:'"As a small investor starting with just $200, I appreciated that VaultX has no minimum pressure. The returns were proportional, the withdrawal was fast, and customer support actually responded within hours."' },
+              { i:'MR', n:'Mostafizur Rahman', r:'International Investor · Khulna', roi:'+26.8%', t:'"I have used similar platforms in Malaysia and Singapore. VaultX is comparable in professionalism — maybe better in terms of communication. The season-based model removes emotional trading decisions entirely."' },
+              { i:'NB', n:'Nasreen Begum', r:'Repeat Investor · Mymensingh', roi:'+27.9%', t:'"My husband and I both invested in Season 3 independently. We both received our returns on the same day, right at the 90-day mark. The consistency here is something we tell everyone in our circle about."' },
+            ].map((c,idx) => (
+              <div className="testi-card" key={idx}>
+                <div className="testi-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+                <p className="testi-text">{c.t}</p>
+                <div className="testi-author"><div className="testi-avatar">{c.i}</div><div><div className="testi-name">{c.n}</div><div className="testi-role">{c.r}</div></div><div className="testi-roi">{c.roi}</div></div>
               </div>
             ))}
           </div>
@@ -1028,219 +455,56 @@ function Home() {
       </section>
 
       {/* ABOUT */}
-      <section className='about' id='about'>
-        <div className='about-inner'>
-          <div className='reveal'>
-            <span className='section-label'>About VaultX</span>
-            <h2 className='section-title'>
-              Built for discipline,
-              <br />
-              not speculation
-            </h2>
-            <p className='section-sub'>
-              VaultX is a structured investment platform operating through
-              defined seasonal cycles. We do not chase volatile markets. We
-              apply systematic, rule-based strategies across diversified asset
-              pools — and we share the results with our investors transparently.
-            </p>
-            <div className='about-features'>
-              <div className='about-feature'>
-                <span className='feature-icon'>⬛</span>
-                <h4>Season-Based Cycles</h4>
-                <p>
-                  Defined entry and exit dates eliminate emotional
-                  decision-making and market timing pressure.
-                </p>
-              </div>
-              <div className='about-feature'>
-                <span className='feature-icon'>◈</span>
-                <h4>Full Transparency</h4>
-                <p>
-                  Every season publishes its pool size, strategy summary, and
-                  projected return range before entries open.
-                </p>
-              </div>
-              <div className='about-feature'>
-                <span className='feature-icon'>◎</span>
-                <h4>USDT Settlement</h4>
-                <p>
-                  All investments and payouts are in USDT. No currency risk, no
-                  conversion friction.
-                </p>
-              </div>
-              <div className='about-feature'>
-                <span className='feature-icon'>◇</span>
-                <h4>Zero Withdrawal Failures</h4>
-                <p>
-                  Across three seasons, every withdrawal has been processed on
-                  time — a record we intend to maintain.
-                </p>
-              </div>
+      <section className="about" id="about">
+        <div className="about-inner">
+          <div className="reveal">
+            <span className="section-label">About VaultX</span>
+            <h2 className="section-title">Built for discipline,<br />not speculation</h2>
+            <p className="section-sub">VaultX is a structured investment platform operating through defined seasonal cycles. We do not chase volatile markets. We apply systematic, rule-based strategies across diversified asset pools — and we share the results with our investors transparently.</p>
+            <div className="about-features">
+              <div className="about-feature"><span className="feature-icon">⬛</span><h4>Season-Based Cycles</h4><p>Defined entry and exit dates eliminate emotional decision-making and market timing pressure.</p></div>
+              <div className="about-feature"><span className="feature-icon">◈</span><h4>Full Transparency</h4><p>Every season publishes its pool size, strategy summary, and projected return range before entries open.</p></div>
+              <div className="about-feature"><span className="feature-icon">◎</span><h4>USDT Settlement</h4><p>All investments and payouts are in USDT. No currency risk, no conversion friction.</p></div>
+              <div className="about-feature"><span className="feature-icon">◇</span><h4>Zero Withdrawal Failures</h4><p>Across three seasons, every withdrawal has been processed on time — a record we intend to maintain.</p></div>
             </div>
           </div>
-          <div className='about-aside reveal'>
-            <div className='aside-card'>
-              <span className='section-label'>Season 4 is Live</span>
+          <div className="about-aside reveal">
+            <div className="aside-card">
+              <span className="section-label">Season 4 is Live</span>
               <h3>Secure your position before entries close</h3>
-              <p>
-                Only 18 days remain in the Season 4 entry window. The pool cap
-                is $80M. Current fill rate is at 62%. Once full, no further
-                entries are accepted.
-              </p>
-              <button className='aside-cta' onClick={() => openModal('signup')}>
-                Open an Account
-              </button>
-              <div className='aside-note'>
-                Minimum investment: $100 USDT · No lock-in fees
-              </div>
+              <p>Only 18 days remain in the Season 4 entry window. The pool cap is $80M. Current fill rate is at 62%. Once full, no further entries are accepted.</p>
+              <button className="aside-cta" onClick={() => router.push('/auth/signup')}>Open an Account</button>
+              <div className="aside-note">Minimum investment: $100 USDT · No lock-in fees</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* CONTACT */}
-      <section className='contact' id='contact'>
-        <div className='contact-inner'>
-          <div className='reveal'>
-            <span className='section-label'>Contact Us</span>
-            <h2 className='section-title'>
-              We respond
-              <br />
-              within 24 hours
-            </h2>
-            <p className='section-sub'>
-              Have a question about a season, a withdrawal, or your referral
-              earnings? Reach out — our team is available every day.
-            </p>
+      <section className="contact" id="contact">
+        <div className="contact-inner">
+          <div className="reveal">
+            <span className="section-label">Contact Us</span>
+            <h2 className="section-title">We respond<br />within 24 hours</h2>
+            <p className="section-sub">Have a question about a season, a withdrawal, or your referral earnings? Reach out — our team is available every day.</p>
             <br />
-            <div className='contact-info'>
-              <div className='contact-item'>
-                <div className='contact-item-icon'>
-                  <svg viewBox='0 0 24 24'>
-                    <path d='M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z' />
-                  </svg>
-                </div>
-                <div>
-                  <strong>Email Support</strong>
-                  <span>
-                    ozzyoo554@gmail.com
-                    <br />
-                    Typically within 4–8 hours
-                  </span>
-                </div>
-              </div>
-              <div className='contact-item'>
-                <div className='contact-item-icon'>
-                  <svg viewBox='0 0 24 24'>
-                    <path d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z' />
-                  </svg>
-                </div>
-                <div>
-                  <strong>Headquarters</strong>
-                  <span>
-                    Dhaka, Bangladesh
-                    <br />
-                    Remote operations globally
-                  </span>
-                </div>
-              </div>
-              <div className='contact-item'>
-                <div className='contact-item-icon'>
-                  <svg viewBox='0 0 24 24'>
-                    <path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z' />
-                  </svg>
-                </div>
-                <div>
-                  <strong>Community Channel</strong>
-                  <span>
-                    Join 50,000+ investors on Telegram
-                    <br />
-                    @VaultXOfficial
-                  </span>
-                </div>
-              </div>
+            <div className="contact-info">
+              <div className="contact-item"><div className="contact-item-icon"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" /></svg></div><div><strong>Email Support</strong><span>ozzyoo554@gmail.com<br />Typically within 4–8 hours</span></div></div>
+              <div className="contact-item"><div className="contact-item-icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /></svg></div><div><strong>Headquarters</strong><span>Dhaka, Bangladesh<br />Remote operations globally</span></div></div>
+              <div className="contact-item"><div className="contact-item-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" /></svg></div><div><strong>Community Channel</strong><span>Join 50,000+ investors on Telegram<br />@VaultXOfficial</span></div></div>
             </div>
           </div>
-          <div className='reveal'>
-            <form className='contact-form' onSubmit={handleContact}>
-              <div className='form-row'>
-                <div className='form-group'>
-                  <label>First Name</label>
-                  <input
-                    type='text'
-                    placeholder='Rafiqul'
-                    required
-                    value={contactForm.firstName}
-                    onChange={(e) =>
-                      setContactForm((p) => ({
-                        ...p,
-                        firstName: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-                <div className='form-group'>
-                  <label>Last Name</label>
-                  <input
-                    type='text'
-                    placeholder='Molla'
-                    required
-                    value={contactForm.lastName}
-                    onChange={(e) =>
-                      setContactForm((p) => ({
-                        ...p,
-                        lastName: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
+          <div className="reveal">
+            <form className="contact-form" onSubmit={handleContact}>
+              <div className="form-row">
+                <div className="form-group"><label>First Name</label><input type="text" placeholder="Rafiqul" required value={contactForm.firstName} onChange={e => setContactForm(p => ({ ...p, firstName: e.target.value }))} /></div>
+                <div className="form-group"><label>Last Name</label><input type="text" placeholder="Molla" required value={contactForm.lastName} onChange={e => setContactForm(p => ({ ...p, lastName: e.target.value }))} /></div>
               </div>
-              <div className='form-group'>
-                <label>Email Address</label>
-                <input
-                  type='email'
-                  placeholder='you@example.com'
-                  required
-                  value={contactForm.email}
-                  onChange={(e) =>
-                    setContactForm((p) => ({ ...p, email: e.target.value }))
-                  }
-                />
-              </div>
-              <div className='form-group'>
-                <label>Subject</label>
-                <select
-                  value={contactForm.subject}
-                  onChange={(e) =>
-                    setContactForm((p) => ({ ...p, subject: e.target.value }))
-                  }
-                >
-                  <option>Season 4 Investment Query</option>
-                  <option>Withdrawal Support</option>
-                  <option>Referral Programme</option>
-                  <option>Account Verification</option>
-                  <option>Other</option>
-                </select>
-              </div>
-              <div className='form-group'>
-                <label>Message</label>
-                <textarea
-                  placeholder='Describe your inquiry...'
-                  required
-                  value={contactForm.message}
-                  onChange={(e) =>
-                    setContactForm((p) => ({ ...p, message: e.target.value }))
-                  }
-                />
-              </div>
-              {contactMsg && <div className='form-msg'>{contactMsg}</div>}
-              <button
-                type='submit'
-                className='form-submit'
-                disabled={contactLoading}
-              >
-                {contactLoading ? 'Sending...' : 'Send Message'}
-              </button>
+              <div className="form-group"><label>Email Address</label><input type="email" placeholder="you@example.com" required value={contactForm.email} onChange={e => setContactForm(p => ({ ...p, email: e.target.value }))} /></div>
+              <div className="form-group"><label>Subject</label><select value={contactForm.subject} onChange={e => setContactForm(p => ({ ...p, subject: e.target.value }))}><option>Season 4 Investment Query</option><option>Withdrawal Support</option><option>Referral Programme</option><option>Account Verification</option><option>Other</option></select></div>
+              <div className="form-group"><label>Message</label><textarea placeholder="Describe your inquiry..." required value={contactForm.message} onChange={e => setContactForm(p => ({ ...p, message: e.target.value }))} /></div>
+              {contactMsg && <div className="form-msg">{contactMsg}</div>}
+              <button type="submit" className="form-submit" disabled={contactLoading}>{contactLoading ? 'Sending...' : 'Send Message'}</button>
             </form>
           </div>
         </div>
@@ -1248,287 +512,22 @@ function Home() {
 
       {/* FOOTER */}
       <footer>
-        <div className='footer-inner'>
-          <div className='footer-top'>
-            <div className='footer-brand'>
-              <a href='#' className='logo'>
-                <div className='logo-mark' />
-                <span className='logo-text'>
-                  Vault<span>X</span>
-                </span>
-              </a>
-              <p>
-                A structured investment platform operating through seasonal
-                cycles with full transparency and consistent returns since 2023.
-              </p>
+        <div className="footer-inner">
+          <div className="footer-top">
+            <div className="footer-brand">
+              <a href="#" className="logo"><div className="logo-mark" /><span className="logo-text">Vault<span>X</span></span></a>
+              <p>A structured investment platform operating through seasonal cycles with full transparency and consistent returns since 2023.</p>
             </div>
-            <div className='footer-col'>
-              <h5>Platform</h5>
-              <ul>
-                <li>
-                  <a href='#seasons'>Seasons</a>
-                </li>
-                <li>
-                  <a onClick={() => openModal('signup')}>Start Investing</a>
-                </li>
-                <li>
-                  <a href='#referral'>Referral Programme</a>
-                </li>
-                <li>
-                  <a href='/dashboard'>Portfolio Tracker</a>
-                </li>
-              </ul>
-            </div>
-            <div className='footer-col'>
-              <h5>Company</h5>
-              <ul>
-                <li>
-                  <a href='#about'>About Us</a>
-                </li>
-                <li>
-                  <a href='#'>Press</a>
-                </li>
-                <li>
-                  <a href='#'>Careers</a>
-                </li>
-                <li>
-                  <a href='#contact'>Contact</a>
-                </li>
-              </ul>
-            </div>
-            <div className='footer-col'>
-              <h5>Legal</h5>
-              <ul>
-                <li>
-                  <a href='#'>Terms of Service</a>
-                </li>
-                <li>
-                  <a href='#'>Privacy Policy</a>
-                </li>
-                <li>
-                  <a href='#'>Risk Disclosure</a>
-                </li>
-                <li>
-                  <a href='#'>KYC Policy</a>
-                </li>
-              </ul>
-            </div>
+            <div className="footer-col"><h5>Platform</h5><ul><li><a href="#seasons">Seasons</a></li><li><a onClick={() => router.push('/auth/signup')}>Start Investing</a></li><li><a href="#referral">Referral Programme</a></li><li><a href="/dashboard">Portfolio Tracker</a></li></ul></div>
+            <div className="footer-col"><h5>Company</h5><ul><li><a href="#about">About Us</a></li><li><a href="#">Press</a></li><li><a href="#">Careers</a></li><li><a href="#contact">Contact</a></li></ul></div>
+            <div className="footer-col"><h5>Legal</h5><ul><li><a href="#">Terms of Service</a></li><li><a href="#">Privacy Policy</a></li><li><a href="#">Risk Disclosure</a></li><li><a href="#">KYC Policy</a></li></ul></div>
           </div>
-          <div className='footer-bottom'>
-            <p>
-              © 2025 VaultX. All rights reserved. Investment returns are not
-              guaranteed.
-            </p>
-            <div className='footer-legal'>
-              <a href='#'>Privacy</a>
-              <a href='#'>Terms</a>
-              <a href='#'>Risk</a>
-            </div>
+          <div className="footer-bottom">
+            <p>© 2025 VaultX. All rights reserved. Investment returns are not guaranteed.</p>
+            <div className="footer-legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Risk</a></div>
           </div>
         </div>
       </footer>
-
-      {/* LOGIN MODAL */}
-      <div
-        className={`modal-overlay ${activeModal === 'login' ? 'active' : ''}`}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) closeModal()
-        }}
-      >
-        <div className='modal'>
-          <div className='modal-head'>
-            <h3>{showForgot ? 'Reset Password' : 'Welcome Back'}</h3>
-            <button className='modal-close' onClick={closeModal}>
-              ✕
-            </button>
-          </div>
-          <div className='modal-body'>
-            {!showForgot ? (
-              <form onSubmit={handleLogin} style={{ display: 'contents' }}>
-                <div className='modal-input'>
-                  <label>Email Address</label>
-                  <input
-                    type='email'
-                    placeholder='you@example.com'
-                    required
-                    value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
-                  />
-                </div>
-                <div className='modal-input'>
-                  <label>Password</label>
-                  <input
-                    type='password'
-                    placeholder='••••••••'
-                    required
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                  />
-                </div>
-                <button
-                  type='button'
-                  className='modal-link'
-                  onClick={() => setShowForgot(true)}
-                >
-                  Forgot password?
-                </button>
-                {loginError && <div className='modal-error'>{loginError}</div>}
-                <button
-                  type='submit'
-                  className='modal-submit'
-                  disabled={loginLoading}
-                >
-                  {loginLoading ? 'Signing In...' : 'Sign In'}
-                </button>
-                <p className='modal-switch'>
-                  Don&apos;t have an account?{' '}
-                  <a
-                    onClick={() => {
-                      setActiveModal('signup')
-                      setLoginError('')
-                    }}
-                  >
-                    Create one
-                  </a>
-                </p>
-              </form>
-            ) : (
-              <form
-                onSubmit={handleForgotPassword}
-                style={{ display: 'contents' }}
-              >
-                <div className='modal-input'>
-                  <label>Email Address</label>
-                  <input
-                    type='email'
-                    placeholder='you@example.com'
-                    required
-                    value={forgotEmail}
-                    onChange={(e) => setForgotEmail(e.target.value)}
-                  />
-                </div>
-                {forgotMsg && (
-                  <div
-                    className={
-                      forgotMsg.includes('sent')
-                        ? 'modal-success'
-                        : 'modal-error'
-                    }
-                  >
-                    {forgotMsg}
-                  </div>
-                )}
-                <button
-                  type='submit'
-                  className='modal-submit'
-                  disabled={forgotLoading}
-                >
-                  {forgotLoading ? 'Sending...' : 'Send Reset Link'}
-                </button>
-                <p className='modal-switch'>
-                  <a onClick={() => setShowForgot(false)}>← Back to Sign In</a>
-                </p>
-              </form>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* SIGNUP MODAL */}
-      <div
-        className={`modal-overlay ${activeModal === 'signup' ? 'active' : ''}`}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) closeModal()
-        }}
-      >
-        <div className='modal'>
-          <div className='modal-head'>
-            <h3>Create Account</h3>
-            <button className='modal-close' onClick={closeModal}>
-              ✕
-            </button>
-          </div>
-          <div className='modal-body'>
-            {signupSuccess ? (
-              <div className='modal-success'>
-                ✅ Account created! Please check your email to verify your
-                account, then sign in.
-              </div>
-            ) : (
-              <form onSubmit={handleSignup} style={{ display: 'contents' }}>
-                <div className='modal-input'>
-                  <label>Full Name</label>
-                  <input
-                    type='text'
-                    placeholder='Rafiqul Molla'
-                    required
-                    value={signupName}
-                    onChange={(e) => setSignupName(e.target.value)}
-                  />
-                </div>
-                <div className='modal-input'>
-                  <label>Email Address</label>
-                  <input
-                    type='email'
-                    placeholder='you@example.com'
-                    required
-                    value={signupEmail}
-                    onChange={(e) => setSignupEmail(e.target.value)}
-                  />
-                </div>
-                <div className='modal-input'>
-                  <label>Password</label>
-                  <input
-                    type='password'
-                    placeholder='Create a strong password'
-                    required
-                    value={signupPassword}
-                    onChange={(e) => setSignupPassword(e.target.value)}
-                  />
-                </div>
-                <div className='modal-input'>
-                  <label>Referral Code (Optional)</label>
-                  <input
-                    type='text'
-                    placeholder='Enter code to earn 7% bonus'
-                    value={signupReferral}
-                    onChange={(e) => setSignupReferral(e.target.value)}
-                  />
-                </div>
-                {signupError && (
-                  <div className='modal-error'>{signupError}</div>
-                )}
-                <button
-                  type='submit'
-                  className='modal-submit'
-                  disabled={signupLoading}
-                >
-                  {signupLoading ? 'Creating Account...' : 'Get Started'}
-                </button>
-                <p className='modal-switch'>
-                  Already have an account?{' '}
-                  <a
-                    onClick={() => {
-                      setActiveModal('login')
-                      setSignupError('')
-                    }}
-                  >
-                    Sign in
-                  </a>
-                </p>
-              </form>
-            )}
-          </div>
-        </div>
-      </div>
     </>
-  )
-}
-
-export default function HomePage() {
-  return (
-    <Suspense fallback={null}>
-      <Home />
-    </Suspense>
   )
 }
