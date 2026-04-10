@@ -332,7 +332,7 @@ function Home() {
         .season-card::after{content:'';position:absolute;inset:0;background:var(--ink);opacity:0;transition:opacity 0.35s;z-index:0}
         .season-card:hover::after{opacity:0.03}
         .season-card>*{position:relative;z-index:1}
-        .season-card.active{background:var(--ink);border-color:var(--ink)}
+        .season-card.active{background:var(--ink);border-color:var(--ink);grid-column:span 3}
         .season-card.active *{color:var(--cream)!important}
         .season-card.active .season-tag{background:rgba(255,255,255,0.1);color:var(--gold-light)!important}
         .season-card.active .season-roi{color:var(--gold-light)!important}
@@ -459,7 +459,7 @@ function Home() {
         .modal-link{font-size:0.75rem;color:var(--gold);cursor:pointer;text-align:right;text-decoration:underline;margin-top:-6px;background:none;border:none;font-family:'DM Sans',sans-serif;width:100%}
         .reveal{opacity:0;transform:translateY(28px);transition:all 0.7s ease}.reveal.visible{opacity:1;transform:none}
         @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-        @media(max-width:900px){.nav-links,.nav-actions{display:none}.hamburger{display:flex}.platform-stats .inner{grid-template-columns:1fr;gap:40px}.seasons-grid{grid-template-columns:1fr}.hiw-steps{grid-template-columns:1fr 1fr}.hiw-header{grid-template-columns:1fr;gap:24px}.referral-inner{grid-template-columns:1fr;gap:40px}.testi-grid{grid-template-columns:1fr}.about-inner{grid-template-columns:1fr;gap:40px}.about-aside{position:static}.contact-inner{grid-template-columns:1fr;gap:48px}.footer-top{grid-template-columns:1fr 1fr;gap:36px}.form-row{grid-template-columns:1fr}.seasons-header{grid-template-columns:1fr}}
+        @media(max-width:900px){.nav-links,.nav-actions{display:none}.hamburger{display:flex}.platform-stats .inner{grid-template-columns:1fr;gap:40px}.seasons-grid{grid-template-columns:1fr}.seasons-grid .season-card.active{grid-column:span 1}.hiw-steps{grid-template-columns:1fr 1fr}.hiw-header{grid-template-columns:1fr;gap:24px}.referral-inner{grid-template-columns:1fr;gap:40px}.testi-grid{grid-template-columns:1fr}.about-inner{grid-template-columns:1fr;gap:40px}.about-aside{position:static}.contact-inner{grid-template-columns:1fr;gap:48px}.footer-top{grid-template-columns:1fr 1fr;gap:36px}.form-row{grid-template-columns:1fr}.seasons-header{grid-template-columns:1fr}}
         @media(max-width:560px){.hiw-steps{grid-template-columns:1fr}.footer-top{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr 1fr}.about-features{grid-template-columns:1fr}.hero-cta{flex-direction:column;width:100%}.btn-lg,.btn-outline-lg{width:100%}.footer-bottom{flex-direction:column;align-items:start}}
       `}</style>
 
@@ -750,10 +750,7 @@ function Home() {
                 </div>
               </div>
             </div>
-            <div
-              className='season-card active'
-              style={{ gridColumn: 'span 3' }}
-            >
+            <div className='season-card active'>
               <div className='season-tag'>Now Open · Limited Slots</div>
               <div
                 style={{
@@ -878,8 +875,8 @@ function Home() {
               others grow
             </h2>
             <p className='section-sub'>
-              Every time someone you referred makes profits, you earn 7% of
-              that amount — automatically, with no limits.
+              Every time someone you referred makes profits, you earn 7% of that
+              amount — automatically, with no limits.
             </p>
             <br />
             <p
@@ -889,10 +886,9 @@ function Home() {
                 lineHeight: '1.8',
               }}
             >
-              Share your unique referral code. When your referee make
-              profits, 7% is credited to your VaultX wallet instantly. Stack
-              referrals with no cap — the more you refer, the more you passively
-              earn.
+              Share your unique referral code. When your referee make profits,
+              7% is credited to your VaultX wallet instantly. Stack referrals
+              with no cap — the more you refer, the more you passively earn.
             </p>
             <br />
             <button
